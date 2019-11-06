@@ -1,15 +1,3 @@
-def dec_to_bin(const):
-    aux = bin(int(const)).replace("0b", "")
-    t = 6 - len(aux)
-
-    ans = ""
-    for i in range(0, t):
-        ans += "0"
-
-    ans += aux
-    return ans    
-
-
 instructions = {
     "SPC":      ["000", "I"],
     "TCHAN":    ["001", "R"],
@@ -42,6 +30,29 @@ registers = {
     "a7": 0
 }
 
+def debug_registers():
+    print("Registradores:")
+    print("a0: ", registers["a0"]) 
+    print("a1: ", registers["a1"]) 
+    print("a2: ", registers["a2"]) 
+    print("a3: ", registers["a3"]) 
+    print("a4: ", registers["a4"]) 
+    print("a5: ", registers["a5"]) 
+    print("a6: ", registers["a6"]) 
+    print("a7: ", registers["a7"]) 
+
+def dec_to_bin(const):
+    aux = bin(int(const)).replace("0b", "")
+    t = 6 - len(aux)
+
+    ans = ""
+    for i in range(0, t):
+        ans += "0"
+
+    ans += aux
+    return ans    
+
+
 #path = input("Digite o caminho completo do arquivo: ")
 
 path = "first.xampa"
@@ -54,6 +65,11 @@ program_memory = []
 
 for i in program_load:
     opcode = ""
+    for j in i:
+        if j == "a0":
+            print("Erro de decodificação! Acesso inválido")
+            exit()
+
     if instructions[i[0]][1] == "I":
         opcode = instructions[i[0]][0] + registers_info[i[1]] + dec_to_bin(i[2])
     else:
@@ -64,10 +80,11 @@ for i in program_load:
     
     program_memory.append(opcode)
 
-program_counter = 0
-while program_counter < len(program_memory):
+registers["a0"] = 0
+
+while registers["a0"] < len(program_memory):
     
-    opcode = program_memory[program_counter]
+    opcode = program_memory[registers["a0"]]
     instruction = opcode[0:3]
 
     # I, R ou TCHAN
@@ -75,8 +92,16 @@ while program_counter < len(program_memory):
 
     if instruction == "000":
         instruction_type = "I"
+        rdest = "a" + str(int(opcode[3:6], 2))
+        const = opcode[6:]
+        registers[rdest] = int(const, 2)  
+
     elif instruction == "001":
         instruction_type = "TCHAN"
+        rdest = "a" + str(int(opcode[3:6], 2))
+        rsrc = "a" + str(int(opcode[6:], 2))
+        registers[rdest] = registers[rsrc]
+
     elif instruction == "010":
         instruction_type = "R"
     elif instruction == "011":
@@ -88,4 +113,6 @@ while program_counter < len(program_memory):
     elif instruction == "110":
         instruction_type = "I"
 
-    program_counter += 1
+    registers["a0"] += 1
+
+debug_registers()
