@@ -104,6 +104,10 @@ while registers["a0"] < len(program_memory):
 
     elif instruction == "010":
         instruction_type = "R"
+        rdest = rdest = "a" + str(int(opcode[3:6], 2))
+        r1 = rdest = "a" + str(int(opcode[3:6], 2))
+        r2 = rdest = "a" + str(int(opcode[3:6], 2))
+
     elif instruction == "011":
         instruction_type = "R"
     elif instruction == "100":
