@@ -104,14 +104,23 @@ while registers["a0"] < len(program_memory):
 
     elif instruction == "010":
         instruction_type = "R"
-        rdest = rdest = "a" + str(int(opcode[3:6], 2))
-        r1 = rdest = "a" + str(int(opcode[3:6], 2))
-        r2 = rdest = "a" + str(int(opcode[3:6], 2))
+        rdest = "a" + str(int(opcode[3:6], 2))
+        r1 = "a" + str(int(opcode[6:9], 2))
+        r2 = "a" + str(int(opcode[9:], 2))
+        registers[rdest] = registers[r1] ^ registers[r2]
 
     elif instruction == "011":
         instruction_type = "R"
+        instruction_type = "R"
+        rdest = "a" + str(int(opcode[3:6], 2))
+        r1 = "a" + str(int(opcode[6:9], 2))
+        r2 = "a" + str(int(opcode[9:], 2))
+        registers[rdest] = registers[r1] + registers[r2]
+
     elif instruction == "100":
         instruction_type = "I"
+        
+
     elif instruction == "101":
         instruction_type = "I"
     elif instruction == "110":
@@ -120,3 +129,4 @@ while registers["a0"] < len(program_memory):
     registers["a0"] += 1
 
 debug_registers()
+

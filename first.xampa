@@ -1,4 +1,3 @@
-SPC a2 5
-SPC a3 10
-TCHAN a4 a2
+SPC a2 8
+SPC a3 8
 PSIRICO a4 a2 a3
