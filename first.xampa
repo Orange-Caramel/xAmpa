@@ -1,3 +1,4 @@
-SPC a2 8
-SPC a3 8
+SPC a2 4
+SPC a3 3
 PSIRICO a4 a2 a3
+EVA a4 5

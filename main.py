@@ -67,7 +67,7 @@ for i in program_load:
     opcode = ""
     for j in i:
         if j == "a0":
-            print("Erro de decodificação! Acesso inválido")
+            print("Booom!!!\nErro de decodificação! Acesso inválido")
             exit()
 
     if instructions[i[0]][1] == "I":
@@ -111,7 +111,6 @@ while registers["a0"] < len(program_memory):
 
     elif instruction == "011":
         instruction_type = "R"
-        instruction_type = "R"
         rdest = "a" + str(int(opcode[3:6], 2))
         r1 = "a" + str(int(opcode[6:9], 2))
         r2 = "a" + str(int(opcode[9:], 2))
@@ -119,10 +118,13 @@ while registers["a0"] < len(program_memory):
 
     elif instruction == "100":
         instruction_type = "I"
-        
+        rdest = "a" + str(int(opcode[3:6], 2))
+        const = int(opcode[6:], 2)
+        registers[rdest] *= const
 
     elif instruction == "101":
         instruction_type = "I"
+
     elif instruction == "110":
         instruction_type = "I"
 
