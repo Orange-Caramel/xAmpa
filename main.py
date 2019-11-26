@@ -1,6 +1,4 @@
 import os
-        
-
 
 #Memory for instructions
 program_memory = []
@@ -43,10 +41,12 @@ registers = {
     "a7": 0
 }
 
+#Start data memory
 def init_data_memory():
     for i in range(0, 2**6):
         data_memory.append(0)
 
+#Aux to debug register
 def debug_registers():
     print("Registradores:")
     print("a0: ", registers["a0"]) 
@@ -58,6 +58,7 @@ def debug_registers():
     print("a6: ", registers["a6"]) 
     print("a7: ", registers["a7"]) 
 
+#Base convertion (10) -> (2)
 def dec_to_bin(const):
     aux = bin(int(const)).replace("0b", "")
     t = 6 - len(aux)
@@ -69,8 +70,8 @@ def dec_to_bin(const):
     ans += aux
     return ans
 
+#Exclusive OR between constants
 def xor(rsrc1, rsrc2):
-    
     value_1 = dec_to_bin(registers[rsrc1])
     value_2 = dec_to_bin(registers[rsrc2])
 
@@ -84,7 +85,7 @@ def xor(rsrc1, rsrc2):
 
     return int(ans, 2)
 
-
+#Decoding intructions 
 def get_program_memory(path):
     f = open(path).read()
     lines = f.split("\n")
@@ -146,7 +147,7 @@ class Cache:
         for i in self.blocks:
             print("Tag", i.tag, "Data", i.instruction)
 
-
+#Main routine to execute VM
 def execute(program_memory, debug):
     #Creating Cache with 4 blocks
     cache = Cache(4)
@@ -156,6 +157,7 @@ def execute(program_memory, debug):
 
     #Main exectuion
     while registers["a0"] < len(program_memory):
+        #Checking the cache
         if cache.check_instruction(registers["a0"]):
             opcode = cache.grab_instruction(registers["a0"])
             if debug == 'S' or debug == 's':
@@ -169,6 +171,7 @@ def execute(program_memory, debug):
             opcode = cache.grab_instruction(registers["a0"])
 
 
+        #Exectuing the instruction
         instruction = opcode[0:3]
 
         if instruction == "000":
@@ -213,10 +216,11 @@ def execute(program_memory, debug):
             os.system("pause")
             os.system("cls")
 
+        #Increasing PC with the next instruction
         registers["a0"] += 1
 
-#path = input("Digite o caminho completo do arquivo: ")
-path = "first.xampa"
+
+path = input("Digite o caminho completo do arquivo: ")
 debug = input("Deseja executar em modo debug? (S / N) ")
 
 init_data_memory()
