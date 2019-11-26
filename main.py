@@ -1,3 +1,14 @@
+import os
+        
+
+
+#Memory for instructions
+program_memory = []
+
+#Main data memory
+data_memory = []
+
+#Map to aux in instructions
 instructions = {
     "SPC":      ["000", "I"],
     "TCHAN":    ["001", "R"],
@@ -8,6 +19,7 @@ instructions = {
     "IVETE":    ["110", "I"]
 }
 
+#Map to aux in registers
 registers_info = {
     "a0": "000",
     "a1": "001",
@@ -19,6 +31,7 @@ registers_info = {
     "a7": "111"
 }
 
+#Memory of registers
 registers = {
     "a0": 0,
     "a1": 0,
@@ -29,6 +42,10 @@ registers = {
     "a6": 0,
     "a7": 0
 }
+
+def init_data_memory():
+    for i in range(0, 2**6):
+        data_memory.append(0)
 
 def debug_registers():
     print("Registradores:")
@@ -69,9 +86,6 @@ def xor(rsrc1, rsrc2):
 
 
 def get_program_memory(path):
-
-    program_memory = []
-
     f = open(path).read()
     lines = f.split("\n")
 
@@ -96,13 +110,65 @@ def get_program_memory(path):
 
     return program_memory
 
-def execute(program_memory):
+#Cache Block
+class Block:
+    def __init__(self, tag, instruction):
+        self.tag = tag
+        self.instruction = instruction
 
+#Cache
+class Cache:
+    def __init__(self, size):
+        self.blocks = [Block(None, None)] * size
+
+    def load_instruction(self, first):
+        if len(program_memory) > first:
+            self.blocks[0] = Block(registers["a0"], program_memory[first])
+        if len(program_memory) > first+1:
+            self.blocks[1] = Block(registers["a0"]+1, program_memory[first+1])
+        if len(program_memory) > first+2:
+            self.blocks[2] = Block(registers["a0"]+2, program_memory[first+2])
+        if len(program_memory) > first+3:
+            self.blocks[3] = Block(registers["a0"]+3, program_memory[first+3])
+
+    def check_instruction(self, tag):
+        for i in self.blocks:
+            if i.tag == tag:
+                return True
+        return False
+    
+    def grab_instruction(self, tag):
+        for i in self.blocks:
+            if i.tag == tag:
+                return i.instruction
+
+    def debug(self):
+        for i in self.blocks:
+            print("Tag", i.tag, "Data", i.instruction)
+
+
+def execute(program_memory, debug):
+    #Creating Cache with 4 blocks
+    cache = Cache(4)
+
+    #Initialize PC
     registers["a0"] = 0
 
+    #Main exectuion
     while registers["a0"] < len(program_memory):
-        
-        opcode = program_memory[registers["a0"]]
+        if cache.check_instruction(registers["a0"]):
+            opcode = cache.grab_instruction(registers["a0"])
+            if debug == 'S' or debug == 's':
+                print("Cache Hit!")
+        else:
+            cache.load_instruction(registers["a0"])
+            if debug == 'S' or debug == 's':
+                print("Cache Miss!")
+                print("Cache atualizada: ")
+                cache.debug()
+            opcode = cache.grab_instruction(registers["a0"])
+
+
         instruction = opcode[0:3]
 
         if instruction == "000":
@@ -133,15 +199,28 @@ def execute(program_memory):
             registers[rdest] = registers[rdest] * registers[const]
 
         elif instruction == "101":
-            instruction_type = "I"
+            rdest = "a" + str(int(opcode[3:6], 2))
+            const = "a" + str(int(opcode[6:], 2))
+            data_memory[const] = registers[rdest]
 
         elif instruction == "110":
-            instruction_type = "I"
+            rdest = "a" + str(int(opcode[3:6], 2))
+            const = "a" + str(int(opcode[6:], 2))
+            registers[rdest] = data_memory[const]
+
+        if debug == 'S' or debug == 's':
+            debug_registers()
+            os.system("pause")
+            os.system("cls")
 
         registers["a0"] += 1
 
 #path = input("Digite o caminho completo do arquivo: ")
 path = "first.xampa"
+debug = input("Deseja executar em modo debug? (S / N) ")
+
+init_data_memory()
 pm = get_program_memory(path)
-execute(pm)
-debug_registers()
+execute(pm, debug)
+if debug == 'N' or debug == 'n':
+    debug_registers()
