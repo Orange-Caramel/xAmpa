@@ -95,8 +95,8 @@ def get_program_memory(path):
     for i in program_load:
         opcode = ""
         for j in i:
-            if j == "a0":
-                print("Erro de decodificação! Acesso inválido")
+            if j == "a0" or j == "a1":
+                print("Boom!\nErro de decodificação! Acesso inválido")
                 exit()
 
         if instructions[i[0]][1] == "I":
@@ -171,7 +171,7 @@ def execute(program_memory, debug):
             opcode = cache.grab_instruction(registers["a0"])
 
 
-        #Exectuing the instruction
+        #Executing the instruction
         instruction = opcode[0:3]
 
         if instruction == "000":
@@ -198,17 +198,17 @@ def execute(program_memory, debug):
 
         elif instruction == "100":
             rdest = "a" + str(int(opcode[3:6], 2))
-            const = "a" + str(int(opcode[6:], 2))
-            registers[rdest] = registers[rdest] * registers[const]
+            const = int(opcode[6:], 2)
+            registers[rdest] = registers[rdest] * const
 
         elif instruction == "101":
             rdest = "a" + str(int(opcode[3:6], 2))
-            const = "a" + str(int(opcode[6:], 2))
+            const = int(opcode[6:], 2)
             data_memory[const] = registers[rdest]
 
         elif instruction == "110":
             rdest = "a" + str(int(opcode[3:6], 2))
-            const = "a" + str(int(opcode[6:], 2))
+            const = int(opcode[6:], 2)
             registers[rdest] = data_memory[const]
 
         if debug == 'S' or debug == 's':
@@ -220,9 +220,9 @@ def execute(program_memory, debug):
         registers["a0"] += 1
 
 
-path = input("Digite o caminho completo do arquivo: ")
+#path = input("Digite o caminho completo do arquivo: ")
 debug = input("Deseja executar em modo debug? (S / N) ")
-
+path = "first.xampa"
 init_data_memory()
 pm = get_program_memory(path)
 execute(pm, debug)
