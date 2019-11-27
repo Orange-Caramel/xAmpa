@@ -220,9 +220,8 @@ def execute(program_memory, debug):
         registers["a0"] += 1
 
 
-#path = input("Digite o caminho completo do arquivo: ")
+path = input("Digite o caminho completo do arquivo: ")
 debug = input("Deseja executar em modo debug? (S / N) ")
-path = "first.xampa"
 init_data_memory()
 pm = get_program_memory(path)
 execute(pm, debug)
